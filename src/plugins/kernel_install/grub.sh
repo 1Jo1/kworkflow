@@ -43,6 +43,7 @@ function run_bootloader_update()
   local cmd_grub
   local cmd_sudo
   local total_count
+  local grub_default_path='/etc/default/grub'
 
   if [[ "$target" == 'local' ]]; then
     cmd_sudo='sudo --preserve-env '
@@ -53,6 +54,17 @@ function run_bootloader_update()
   if [[ "$?" -gt 0 ]]; then
     complain "There is no grub-mkconfig command in the system."
     return 125 # ECANCELED
+  fi
+
+  # Add kernel command line parameters if specified
+  if [[ -n "${deploy_config[kernel_cmdline_params]}" ]]; then
+    local current_params
+    current_params=$(cmd_manager 'SILENT' "${cmd_sudo}grep '^GRUB_CMDLINE_LINUX=' ${grub_default_path}" | cut -d'"' -f2)
+    if [[ -n "$current_params" ]]; then
+      cmd_manager "$flag" "${cmd_sudo}sed -i 's/^GRUB_CMDLINE_LINUX=.*/GRUB_CMDLINE_LINUX=\"${current_params} ${deploy_config[kernel_cmdline_params]}\"/' ${grub_default_path}"
+    else
+      cmd_manager "$flag" "${cmd_sudo}echo 'GRUB_CMDLINE_LINUX=\"${deploy_config[kernel_cmdline_params]}\"' >> ${grub_default_path}"
+    fi
   fi
 
   cmd_grub+="$DEFAULT_GRUB_CMD_UPDATE"
