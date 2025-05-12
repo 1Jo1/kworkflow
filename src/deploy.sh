@@ -1236,7 +1236,7 @@ function build_kw_kernel_package()
   fi
   _kernel_binary_image_name="$final_kernel_binary_image_name"
   # 4. If we have dtb files, let's copy it
-  get_dts_and_dtb_files_for_deploy "$arch" "$kernel_tree_boot_folder_path" "$cache_base_kw_pkg_store_path"
+  # get_dts_and_dtb_files_for_deploy "$arch" "$kernel_tree_boot_folder_path" "$cache_base_kw_pkg_store_path"
 
   # 5. Build metadata file
   create_pkg_metadata_file_for_deploy "$arch" "$kernel_name" "$final_kernel_binary_image_name" \
